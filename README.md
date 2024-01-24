@@ -7,3 +7,4 @@ This library provides some out-of-the-box code that can implement certain functi
 
 # Tools
 * **[Get software keyboard height and whether visible](https://github.com/Z-Siqi/JetpackCompose-Gadget/tree/master/codes/KeyboardHeight)**
+* **[Fix BasicTextField2 cannot delete texts after select all](https://github.com/Z-Siqi/JetpackCompose-Gadget/tree/main/codes/FixBTF2)**

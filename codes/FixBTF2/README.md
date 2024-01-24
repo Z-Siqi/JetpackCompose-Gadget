@@ -3,6 +3,8 @@
 As of now (24, Jan, 2024), the problem of BasicTextField2 not being able to delete texts after click select all text still exists. 
 (androidx.compose.foundation:foundation-android:1.6.0-rc01)
 
+Reported issues: [Link](https://issuetracker.google.com/issues/319188299)
+
 Here's a way to fix it.
 
 **Example code Link: https://github.com/Z-Siqi/JetpackCompose-Gadget/blob/main/codes/FixBTF2/ExampleCode.kt**
