@@ -1,41 +1,49 @@
 ### About
 
-~As of now (24, Jan, 2024), the problem of BasicTextField2 not being able to delete texts after click select all text still exists. 
-(androidx.compose.foundation:foundation-android:1.6.0-rc01)~ Fixed in 1.7.0
+Temporarily fix some known issues from `androidx.compose.foundation:foundation-android:1.7.0-alpha08`
 
-Reported issues: [Link](https://issuetracker.google.com/issues/319188299)
-
-Here's a way to fix it.
-
-**Example code Link: https://github.com/Z-Siqi/JetpackCompose-Gadget/blob/main/codes/FixBTF2/ExampleCode.kt**
+**Code Link: https://github.com/Z-Siqi/JetpackCompose-Gadget/blob/main/codes/FixBTF2/ExampleCode.kt**
 
 ### How to Use:
 
-Keep these codes below
+Uses just like the original BasicTextField.
 
 ````
-/***/
-val state = rememberTextFieldState()
-var fixChooseAll by remember { mutableStateOf(false) }
-if (
-(!fixChooseAll) &&
-(state.text.selectionInChars.length == state.text.length) &&
-(state.text.isNotEmpty())
-) {
-    state.edit { placeCursorAtEnd() }
-    state.edit { selectAll() }
-    fixChooseAll = true
-} else if (state.text.selectionInChars.length < state.text.length) {
-    fixChooseAll = false
-}
 BasicTextField2(
-    state = state,
-    //Your codes
+    state: TextFieldState,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    inputTransformation: InputTransformation? = null,
+    textStyle: TextStyle = TextStyle.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    onKeyboardAction: KeyboardActionHandler? = null,
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.Default,
+    onTextLayout: (Density.(getResult: () -> TextLayoutResult?) -> Unit)? = null,
+    interactionSource: MutableInteractionSource? = null,
+    cursorBrush: Brush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant),
+    outputTransformation: OutputTransformation? = null,
+    decorator: TextFieldDecorator? = null,
+    scrollState: ScrollState = rememberScrollState(),
+    // Fixes Control
+    enableFixSelection: Boolean = true,
+    enableFixNonEnglishKeyboard: Boolean = true,
+    verticalScrollWhenCursorUnderKeyboard: Boolean = false,
+    extraScrollValue: Int = 1
 )
-/***/
 ````
 
-[TextFieldState() usage tips](https://developer.android.com/reference/kotlin/androidx/compose/foundation/text2/input/TextFieldState)
+**enableFixSelection:**
+Fixed selection will broken and delete text before selected text when second delete a line; In Chinese Simplified keyboard will be totally broken, cannot delete anything.
+
+**enableFixNonEnglishKeyboard:**
+Fixed non-english keyboard may unable to delete texts after selected.
+
+**verticalScrollWhenCursorUnderKeyboard (Off by default):**
+Fixed the text area won't scroll to visible when clicked area below keyboard (Only happend in androidx.compose.foundation:foundation-android:1.7.0-alpha08. If below will not work!!!).
+
+**extraScrollValue (Only work when `verticalScrollWhenCursorUnderKeyboard = true`):**
+Adjust additional rolling values as needed according to actual conditions.
 
 ### LICENSE
 
