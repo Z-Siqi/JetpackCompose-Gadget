@@ -7,8 +7,14 @@
  */
 
 import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.Log
+import android.view.SoundEffectConstants
+import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,9 +61,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.ContextCompat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -70,6 +78,8 @@ fun TimeSelectDialog(
     context: Context,
     modifier: Modifier = Modifier
 ) {
+    val view = LocalView.current
+
     var isTimeInput by rememberSaveable { mutableStateOf(false) }
     var datePickDialog by rememberSaveable { mutableStateOf(false) }
     var isDatePick by rememberSaveable { mutableStateOf(false) }
@@ -98,7 +108,10 @@ fun TimeSelectDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             Row(modifier = modifier.fillMaxWidth()) {
-                if (!timePickLimit) IconButton(onClick = { isTimeInput = !isTimeInput }) {
+                if (!timePickLimit) IconButton(onClick = {
+                    isTimeInput = !isTimeInput
+                    view.playSoundEffect(SoundEffectConstants.CLICK)
+                }) {
                     fun icon(): Pair<ImageVector, String> = if (isTimeInput)
                         Pair(Icons.Default.DateRange, "Pick")
                     else Pair(Icons.Default.Edit, "Input")
@@ -144,6 +157,22 @@ fun TimeSelectDialog(
                                 TimePickerLayoutType.Vertical
                             }
                         )
+						var oldH by remember { mutableIntStateOf(timePickerState.hour) }
+                        var oldM by remember { mutableIntStateOf(timePickerState.minute) }
+                        @RequiresApi(Build.VERSION_CODES.Q)
+                        if (oldH != timePickerState.hour) {
+                            oldH = timePickerState.hour
+                            ContextCompat.getSystemService(context, Vibrator::class.java)?.vibrate(
+                                VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK)
+                            )
+                        }
+                        @RequiresApi(Build.VERSION_CODES.Q)
+                        if (oldM != timePickerState.minute) {
+                            oldM = timePickerState.minute
+                            ContextCompat.getSystemService(context, Vibrator::class.java)?.vibrate(
+                                VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK)
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = modifier.fillMaxWidth())
@@ -156,6 +185,7 @@ fun TimeSelectDialog(
                             rememberDays = 0
                             isDatePick = false
                         }
+						view.playSoundEffect(SoundEffectConstants.CLICK)
                     },
                     colors = if (isDatePick) ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -185,15 +215,20 @@ fun TimeSelectDialog(
     )
     if (datePickDialog) {
         DatePickDialog(
-            onDismissRequest = { datePickDialog = false },
+            onDismissRequest = {
+                datePickDialog = false
+                view.playSoundEffect(SoundEffectConstants.CLICK)
+            },
             onConfirm = {
                 isDatePick = true
                 datePickDialog = false
+                view.playSoundEffect(SoundEffectConstants.CLICK)
             },
             selectedDate = {
                 rememberDays = it
             },
-            context = context
+            context = context,
+            view = view
         )
     }
     if (isDatePick && rememberDays > 0) {
@@ -210,6 +245,7 @@ private fun DatePickDialog(
     onConfirm: () -> Unit,
     selectedDate: (day: Int) -> Unit,
     context: Context,
+    view: View,
     modifier: Modifier = Modifier
 ) {
     var invalid by rememberSaveable { mutableStateOf(false) }
@@ -263,6 +299,7 @@ private fun DatePickDialog(
                     selectedDate((day))
                 } else selectedDate((day))
             }
+			view.playSoundEffect(SoundEffectConstants.CLICK)
         }
         if (dialog) {
             AlertDialog(
@@ -331,6 +368,6 @@ private fun TimePreview() {
 private fun DatePreview() {
     DatePickDialog(
         onDismissRequest = {}, onConfirm = {}, selectedDate = {},
-        context = LocalContext.current
+        context = LocalContext.current, view = LocalView.current
     )
 }
